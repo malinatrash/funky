@@ -1,11 +1,11 @@
 package fp
 
-// Reduce сворачивает слайс в одно значение
+// Reduce reduces a slice to a single value
 func Reduce[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	if slice == nil {
 		return initial
 	}
-	
+
 	result := initial
 	for _, item := range slice {
 		result = reducer(result, item)
@@ -13,12 +13,12 @@ func Reduce[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	return result
 }
 
-// ReduceWithIndex сворачивает слайс в одно значение с индексом
+// ReduceWithIndex reduces a slice to a single value with index
 func ReduceWithIndex[T, R any](slice []T, reducer ReducerWithIndex[T, R], initial R) R {
 	if slice == nil {
 		return initial
 	}
-	
+
 	result := initial
 	for i, item := range slice {
 		result = reducer(result, item, i)
@@ -26,12 +26,12 @@ func ReduceWithIndex[T, R any](slice []T, reducer ReducerWithIndex[T, R], initia
 	return result
 }
 
-// ReduceRight сворачивает слайс справа налево
+// ReduceRight reduces a slice to a single value from right to left
 func ReduceRight[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	if slice == nil {
 		return initial
 	}
-	
+
 	result := initial
 	for i := len(slice) - 1; i >= 0; i-- {
 		result = reducer(result, slice[i])
@@ -39,22 +39,22 @@ func ReduceRight[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	return result
 }
 
-// Fold - алиас для Reduce (более функциональное название)
+// Fold - alias for Reduce (more functional name)
 func Fold[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	return Reduce(slice, reducer, initial)
 }
 
-// FoldLeft - алиас для Reduce
+// FoldLeft - alias for Reduce
 func FoldLeft[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	return Reduce(slice, reducer, initial)
 }
 
-// FoldRight - алиас для ReduceRight
+// FoldRight - alias for ReduceRight
 func FoldRight[T, R any](slice []T, reducer Reducer[T, R], initial R) R {
 	return ReduceRight(slice, reducer, initial)
 }
 
-// Sum суммирует числовые значения
+// Sum sums numeric values
 func Sum[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64](slice []T) T {
 	var sum T
 	for _, item := range slice {
@@ -63,12 +63,12 @@ func Sum[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | 
 	return sum
 }
 
-// Product перемножает числовые значения
+// Product multiplies numeric values
 func Product[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64](slice []T) T {
 	if len(slice) == 0 {
 		return 0
 	}
-	
+
 	var product T = 1
 	for _, item := range slice {
 		product *= item
@@ -76,13 +76,13 @@ func Product[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint1
 	return product
 }
 
-// Min находит минимальное значение
+// Min finds the minimum value
 func Min[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64](slice []T) (T, bool) {
 	if len(slice) == 0 {
 		var zero T
 		return zero, false
 	}
-	
+
 	min := slice[0]
 	for _, item := range slice[1:] {
 		if item < min {
@@ -92,13 +92,13 @@ func Min[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | 
 	return min, true
 }
 
-// Max находит максимальное значение
+// Max finds the maximum value
 func Max[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64](slice []T) (T, bool) {
 	if len(slice) == 0 {
 		var zero T
 		return zero, false
 	}
-	
+
 	max := slice[0]
 	for _, item := range slice[1:] {
 		if item > max {
@@ -108,13 +108,13 @@ func Max[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | 
 	return max, true
 }
 
-// MinBy находит минимальный элемент по функции сравнения
+// MinBy finds the minimum element by comparator
 func MinBy[T any](slice []T, comparator Comparator[T]) (T, bool) {
 	if len(slice) == 0 {
 		var zero T
 		return zero, false
 	}
-	
+
 	min := slice[0]
 	for _, item := range slice[1:] {
 		if comparator(item, min) < 0 {
@@ -124,13 +124,13 @@ func MinBy[T any](slice []T, comparator Comparator[T]) (T, bool) {
 	return min, true
 }
 
-// MaxBy находит максимальный элемент по функции сравнения
+// MaxBy finds the maximum element by comparator
 func MaxBy[T any](slice []T, comparator Comparator[T]) (T, bool) {
 	if len(slice) == 0 {
 		var zero T
 		return zero, false
 	}
-	
+
 	max := slice[0]
 	for _, item := range slice[1:] {
 		if comparator(item, max) > 0 {
@@ -140,12 +140,12 @@ func MaxBy[T any](slice []T, comparator Comparator[T]) (T, bool) {
 	return max, true
 }
 
-// GroupBy группирует элементы по ключу
+// GroupBy groups elements by key
 func GroupBy[T any, K comparable](slice []T, keyExtractor KeyExtractor[T, K]) map[K][]T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	groups := make(map[K][]T)
 	for _, item := range slice {
 		key := keyExtractor(item)
@@ -154,12 +154,12 @@ func GroupBy[T any, K comparable](slice []T, keyExtractor KeyExtractor[T, K]) ma
 	return groups
 }
 
-// GroupByCount группирует и подсчитывает элементы по ключу
+// GroupByCount groups and counts elements by key
 func GroupByCount[T any, K comparable](slice []T, keyExtractor KeyExtractor[T, K]) map[K]int {
 	if slice == nil {
 		return nil
 	}
-	
+
 	counts := make(map[K]int)
 	for _, item := range slice {
 		key := keyExtractor(item)
@@ -168,7 +168,7 @@ func GroupByCount[T any, K comparable](slice []T, keyExtractor KeyExtractor[T, K
 	return counts
 }
 
-// Join объединяет строки с разделителем
+// Join joins strings with a separator
 func Join(slice []string, separator string) string {
 	if len(slice) == 0 {
 		return ""
@@ -176,39 +176,38 @@ func Join(slice []string, separator string) string {
 	if len(slice) == 1 {
 		return slice[0]
 	}
-	
-	// Подсчитываем общую длину для оптимизации
+
 	totalLen := len(separator) * (len(slice) - 1)
 	for _, s := range slice {
 		totalLen += len(s)
 	}
-	
+
 	result := make([]byte, 0, totalLen)
 	result = append(result, slice[0]...)
-	
+
 	for _, s := range slice[1:] {
 		result = append(result, separator...)
 		result = append(result, s...)
 	}
-	
+
 	return string(result)
 }
 
-// JoinBy объединяет элементы в строку через функцию преобразования
+// JoinBy joins elements into a string using a mapper function
 func JoinBy[T any](slice []T, mapper func(T) string, separator string) string {
 	if len(slice) == 0 {
 		return ""
 	}
-	
+
 	strings := make([]string, len(slice))
 	for i, item := range slice {
 		strings[i] = mapper(item)
 	}
-	
+
 	return Join(strings, separator)
 }
 
-// Aggregate выполняет агрегацию с несколькими аккумуляторами
+// Aggregate executes aggregation with multiple accumulators
 func Aggregate[T any, R any](slice []T, initial R, aggregator func(R, T) R) R {
 	return Reduce(slice, aggregator, initial)
 }

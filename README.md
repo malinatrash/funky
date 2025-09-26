@@ -1,43 +1,43 @@
 # Functional Programming Library for Go
 
-Мощная библиотека функционального программирования для Go с современными дженериками.
+Powerful library for functional programming in Go with modern generics.
 
-## Основные возможности
+## Main features
 
-### 🚀 Базовые функции
+### 🚀 Base functions
 
-- **Map, Filter, Reduce** - классические функции высшего порядка
-- **Параллельная обработка** - автоматическое распараллеливание для больших коллекций
-- **Композиция функций** - Pipe, Compose, Curry
+- **Map, Filter, Reduce** - classic functions of higher order
+- **Parallel processing** - automatic parallelization for large collections
+- **Function composition** - Pipe, Compose, Curry
 
-### 🔧 Продвинутые утилиты
+### 🔧 Advanced utilities
 
-- **Optional/Result типы** - безопасная работа с nullable значениями
-- **Коллекции** - GroupBy, Chunk, Partition, Zip, Flatten
-- **Параллельные операции** - с контекстом и rate limiting
+- **Optional/Result types** - safe work with nullable values
+- **Collections** - GroupBy, Chunk, Partition, Zip, Flatten
+- **Parallel operations** - with context and rate limiting
 
-## Примеры использования
+## Examples
 
-### Базовые операции
+### Base operations
 
 ```go
 import "github.com/malinatrash/funky/pkg/fp"
 
-// Map - преобразование
+// Map - transformation
 numbers := []int{1, 2, 3, 4, 5}
 doubled := fp.Map(numbers, func(x int) int { return x * 2 })
 // [2, 4, 6, 8, 10]
 
-// Filter - фильтрация
+// Filter - filtering
 evens := fp.Filter(numbers, func(x int) bool { return x%2 == 0 })
 // [2, 4]
 
-// Reduce - свертка
+// Reduce - reduction
 sum := fp.Reduce(numbers, func(acc, x int) int { return acc + x }, 0)
 // 15
 ```
 
-### Pipeline обработки
+### Pipeline processing
 
 ```go
 result := fp.NewPipeline([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).
@@ -47,15 +47,15 @@ result := fp.NewPipeline([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).
 // [4, 16, 36, 64, 100]
 ```
 
-### Optional/Result типы
+### Optional/Result types
 
 ```go
-// Optional для безопасной работы с nil
+// Optional for safe work with nil
 user := fp.Some("John")
 name := user.Map(strings.ToUpper).GetOrElse("Unknown")
 // "JOHN"
 
-// Result для обработки ошибок
+// Result for error handling
 result := fp.Try(func() (int, error) {
     return strconv.Atoi("42")
 }).Map(func(x int) int { return x * 2 })
@@ -65,17 +65,17 @@ if result.IsOk() {
 }
 ```
 
-### Композиция функций
+### Function composition
 
 ```go
-// Pipe - слева направо
+// Pipe - from left to right
 result := fp.Pipe3("hello",
     strings.ToUpper,
     func(s string) string { return s + "!" },
     func(s string) string { return ">>> " + s })
 // ">>> HELLO!"
 
-// Compose - справа налево
+// Compose - from right to left
 transform := fp.Compose3(
     func(s string) string { return ">>> " + s },
     func(s string) string { return s + "!" },
@@ -84,7 +84,7 @@ result := transform("hello")
 // ">>> HELLO!"
 ```
 
-### Работа с коллекциями
+### Collections
 
 ```go
 // GroupBy
@@ -103,42 +103,42 @@ pairs := fp.Zip(names, ages)
 // [{John, 25}, {Jane, 30}]
 ```
 
-### Параллельная обработка
+### Parallel processing
 
 ```go
-// Параллельный Map
+// Parallel Map
 large := make([]int, 10000)
 result := fp.MapParallel(large, heavyComputation)
 
-// С контекстом
+// With context
 ctx := context.Background()
 result, err := fp.MapWithContext(ctx, data, func(ctx context.Context, item int) (string, error) {
     return processItem(ctx, item)
 }, fp.DefaultParallelConfig())
 ```
 
-## Структура библиотеки
+## Library structure
 
-- `commonconst.go` - Общие типы и константы
-- `map.go` - Функции преобразования
-- `filter.go` - Функции фильтрации
-- `reduce.go` - Функции свертки и агрегации
-- `compose.go` - Композиция и каррирование функций
-- `collections.go` - Утилиты для работы с коллекциями
-- `optional.go` - Optional и Result типы
-- `parallel.go` - Параллельная обработка
-- `utils.go` - Дополнительные утилиты
+- `commonconst.go` - Common types and constants
+- `map.go` - Mapping functions
+- `filter.go` - Filtering functions
+- `reduce.go` - Reduction functions
+- `compose.go` - Function composition and currying
+- `collections.go` - Collection utilities
+- `optional.go` - Optional and Result types
+- `parallel.go` - Parallel processing
+- `utils.go` - Additional utilities
 
-## Производительность
+## Performance
 
-Библиотека автоматически выбирает оптимальную стратегию:
+The library automatically selects the optimal strategy:
 
-- Для маленьких коллекций (<100 элементов) - последовательная обработка
-- Для больших коллекций - параллельная обработка с воркер-пулом
-- Настраиваемые параметры параллелизма
+- For small collections (<100 elements) - sequential processing
+- For large collections - parallel processing with worker pool
+- Configurable parallelism parameters
 
-## Совместимость
+## Compatibility
 
-- Go 1.18+ (требуются дженерики)
-- Thread-safe операции
-- Zero-dependency (только стандартная библиотека)
+- Go 1.18+ (requires generics)
+- Thread-safe operations
+- Zero-dependency (only standard library)

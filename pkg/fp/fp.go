@@ -1,17 +1,16 @@
-// Package fp предоставляет мощную библиотеку функционального программирования для Go
-// с современными дженериками, включающую все необходимые инструменты для
-// функциональной обработки данных.
+// Package fp provides a powerful functional programming library for Go
+// with generics, including all necessary tools for functional data processing.
 //
-// Основные возможности:
-//   - Базовые функции высшего порядка (Map, Filter, Reduce)
-//   - Композиция и каррирование функций (Pipe, Compose, Curry)
-//   - Безопасная работа с nullable значениями (Optional, Result)
-//   - Утилиты для работы с коллекциями (GroupBy, Chunk, Partition)
-//   - Параллельная обработка данных с контекстом
-//   - Stream API для ленивых вычислений
-//   - Множество дополнительных утилит
+// Main features:
+//   - Basic higher-order functions (Map, Filter, Reduce)
+//   - Function composition and currying (Pipe, Compose, Curry)
+//   - Safe nullable value handling (Optional, Result)
+//   - Collection utilities (GroupBy, Chunk, Partition)
+//   - Parallel data processing with context
+//   - Lazy evaluation with Stream API
+//   - A set of additional utilities
 //
-// Пример базового использования:
+// Example of basic usage:
 //
 //	import "github.com/malinatrash/funky/pkg/fp"
 //
@@ -25,7 +24,7 @@
 //	sum := fp.Reduce(numbers, func(acc, x int) int { return acc + x }, 0)
 //	// 15
 //
-// Пример с Pipeline:
+// Example with Pipeline:
 //
 //	result := fp.NewPipeline([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).
 //	    Filter(func(x int) bool { return x%2 == 0 }).
@@ -33,13 +32,13 @@
 //	    Collect()
 //	// [4, 16, 36, 64, 100]
 //
-// Пример с Optional:
+// Example with Optional:
 //
 //	user := fp.Some("John")
 //	name := user.Map(strings.ToUpper).GetOrElse("Unknown")
 //	// "JOHN"
 //
-// Пример с Stream:
+// Example with Stream:
 //
 //	numbers := fp.RangeStream(1, 11).
 //	    Filter(func(x int) bool { return x%2 == 0 }).
@@ -47,141 +46,117 @@
 //	    Take(3).
 //	    Collect()
 //	// [4, 16, 36]
-//
 package fp
 
-// Версия библиотеки
-const Version = "1.0.0"
-
-// Информация о библиотеке
-var (
-	Name        = "Functional Programming Library for Go"
-	Description = "Comprehensive functional programming toolkit with generics"
-	Author      = "NLG.KZ Backend Team"
+import (
+	"fmt"
+	"strings"
+	"sync"
+	"time"
 )
 
-// GetVersion возвращает версию библиотеки
-func GetVersion() string {
-	return Version
-}
-
-// GetInfo возвращает информацию о библиотеке
-func GetInfo() map[string]string {
-	return map[string]string{
-		"name":        Name,
-		"version":     Version,
-		"description": Description,
-		"author":      Author,
-	}
-}
-
-// Экспорт основных типов для удобства использования
-
-// Основные функциональные типы
+// Basic functional types
 type (
-	// Func представляет функцию одного аргумента
+	// Func represents a function with one argument
 	Func[T, R any] func(T) R
-	
-	// BiFunc представляет функцию двух аргументов
+
+	// BiFunc represents a function with two arguments
 	BiFunc[T, R, S any] func(T, R) S
-	
-	// Consumer представляет функцию-потребитель
+
+	// Consumer represents a function that consumes a value
 	Consumer[T any] func(T)
-	
-	// Supplier представляет функцию-поставщик
+
+	// Supplier represents a function that provides a value
 	Supplier[T any] func() T
-	
-	// Runnable представляет функцию без аргументов и возвращаемого значения
+
+	// Runnable represents a function without arguments and return value
 	Runnable func()
 )
 
-// Утилиты для создания функций
+// Utilities for creating functions
 
-// AsFunc преобразует функцию в Func
+// AsFunc converts a function to Func
 func AsFunc[T, R any](f func(T) R) Func[T, R] {
 	return f
 }
 
-// AsBiFunc преобразует функцию в BiFunc
+// AsBiFunc converts a function to BiFunc
 func AsBiFunc[T, R, S any](f func(T, R) S) BiFunc[T, R, S] {
 	return f
 }
 
-// AsConsumer преобразует функцию в Consumer
+// AsConsumer converts a function to Consumer
 func AsConsumer[T any](f func(T)) Consumer[T] {
 	return f
 }
 
-// AsSupplier преобразует функцию в Supplier
+// AsSupplier converts a function to Supplier
 func AsSupplier[T any](f func() T) Supplier[T] {
 	return f
 }
 
-// AsRunnable преобразует функцию в Runnable
+// AsRunnable converts a function to Runnable
 func AsRunnable(f func()) Runnable {
 	return f
 }
 
-// Цепочка вызовов для Func
-
-// AndThen создает композицию функций (сначала текущая, потом after)
+// AndThen creates a function composition (first current, then after)
 func (f Func[T, R]) AndThen(after Func[R, any]) Func[T, any] {
 	return func(t T) any {
 		return after(f(t))
 	}
 }
 
-// Compose создает композицию функций (сначала before, потом текущая)
+// Compose creates a function composition (first before, then current)
 func (f Func[T, R]) Compose(before Func[any, T]) Func[any, R] {
 	return func(v any) R {
 		return f(before(v))
 	}
 }
 
-// Константы для часто используемых операций
-
+// Constants for frequently used operations
 var (
-	// IntAdd складывает два числа
+	// IntAdd adds two numbers
 	IntAdd = func(a, b int) int { return a + b }
-	
-	// IntMul умножает два числа
+
+	// IntMul multiplies two numbers
 	IntMul = func(a, b int) int { return a * b }
-	
-	// IntMax возвращает максимум из двух чисел
+
+	// IntMax returns the maximum of two numbers
 	IntMax = func(a, b int) int {
 		if a > b {
 			return a
 		}
 		return b
 	}
-	
-	// IntMin возвращает минимум из двух чисел
+
+	// IntMin returns the minimum of two numbers
 	IntMin = func(a, b int) int {
 		if a < b {
 			return a
 		}
 		return b
 	}
-	
-	// StringConcat объединяет две строки
+
+	// StringConcat concatenates two strings
 	StringConcat = func(a, b string) string { return a + b }
-	
-	// IsPositive проверяет, что число положительное
+
+	// IsPositive checks if a number is positive
 	IsPositive = func(x int) bool { return x > 0 }
-	
-	// IsNegative проверяет, что число отрицательное
+
+	// IsNegative checks if a number is negative
 	IsNegative = func(x int) bool { return x < 0 }
-	
-	// IsEven проверяет, что число четное
+
+	// IsEven checks if a number is even
 	IsEven = func(x int) bool { return x%2 == 0 }
-	
-	// IsOdd проверяет, что число нечетное
+
+	// IsOdd checks if a number is odd
 	IsOdd = func(x int) bool { return x%2 != 0 }
 )
 
-// Быстрые операции для чисел
+// Fast operations for numbers
 
-// Numbers предоставляет утилиты для работы с числами
+// Numbers provides utilities for working with numbers
 var Numbers = struct {
 	Add      func(a, b int) int
 	Subtract func(a, b int) int
@@ -211,7 +186,7 @@ var Numbers = struct {
 	Half:   func(x int) int { return x / 2 },
 }
 
-// Strings предоставляет утилиты для работы со строками
+// Strings provides utilities for working with strings
 var Strings = struct {
 	ToUpper    func(s string) string
 	ToLower    func(s string) string
@@ -236,7 +211,7 @@ var Strings = struct {
 	},
 }
 
-// Slices предоставляет утилиты для работы со слайсами
+// Slices provides utilities for working with slices
 var Slices = struct {
 	IsEmpty    func(slice []any) bool
 	IsNotEmpty func(slice []any) bool
@@ -261,7 +236,7 @@ var Slices = struct {
 	},
 }
 
-// Predicates предоставляет готовые предикаты
+// Predicates provides ready-to-use predicates
 var Predicates = struct {
 	True     func(any) bool
 	False    func(any) bool
@@ -282,7 +257,7 @@ var Predicates = struct {
 	NotEmpty: func(s string) bool { return len(s) > 0 },
 }
 
-// Collectors предоставляет готовые коллекторы
+// Collectors provides ready-to-use collectors
 var Collectors = struct {
 	ToSlice   func() func([]any) []any
 	ToSet     func() func([]any) map[any]bool
@@ -321,45 +296,45 @@ var Collectors = struct {
 	},
 }
 
-// Быстрые алиасы для часто используемых функций
+// Fast provides aliases for frequently used functions
 
-// F создает функцию из лямбды (алиас для удобства)
+// F creates a function from a lambda (alias for convenience)
 func F[T, R any](f func(T) R) Func[T, R] {
 	return f
 }
 
-// P создает предикат (алиас для удобства)
+// P creates a predicate (alias for convenience)
 func P[T any](f func(T) bool) Predicate[T] {
 	return f
 }
 
-// C создает consumer (алиас для удобства)
+// C creates a consumer (alias for convenience)
 func C[T any](f func(T)) Consumer[T] {
 	return f
 }
 
-// S создает supplier (алиас для удобства)
+// S creates a supplier (alias for convenience)
 func S[T any](f func() T) Supplier[T] {
 	return f
 }
 
-// Дополнительные утилиты
+// Additional utilities
 
-// Times выполняет функцию n раз
+// Times executes a function n times
 func Times(n int, action Runnable) {
 	for i := 0; i < n; i++ {
 		action()
 	}
 }
 
-// TimesWithIndex выполняет функцию n раз с передачей индекса
+// TimesWithIndex executes a function n times with index
 func TimesWithIndex(n int, action func(int)) {
 	for i := 0; i < n; i++ {
 		action(i)
 	}
 }
 
-// Benchmark измеряет время выполнения функции
+// Benchmark measures the execution time of a function
 func Benchmark[T any](name string, fn func() T) T {
 	start := time.Now()
 	result := fn()
@@ -368,16 +343,16 @@ func Benchmark[T any](name string, fn func() T) T {
 	return result
 }
 
-// Lazy создает ленивое значение
+// Lazy creates a lazy value
 func Lazy[T any](supplier Supplier[T]) func() T {
 	var value T
 	var computed bool
 	var mutex sync.Mutex
-	
+
 	return func() T {
 		mutex.Lock()
 		defer mutex.Unlock()
-		
+
 		if !computed {
 			value = supplier()
 			computed = true
@@ -385,11 +360,3 @@ func Lazy[T any](supplier Supplier[T]) func() T {
 		return value
 	}
 }
-
-// Необходимые импорты для компиляции
-import (
-	"fmt"
-	"strings"
-	"sync"
-	"time"
-)

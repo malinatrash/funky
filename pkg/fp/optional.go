@@ -2,23 +2,23 @@ package fp
 
 import "fmt"
 
-// Optional представляет значение, которое может отсутствовать
+// Optional represents a value that may be absent
 type Optional[T any] struct {
 	value   T
 	present bool
 }
 
-// Some создает Optional с значением
+// Some creates Optional with a value
 func Some[T any](value T) Optional[T] {
 	return Optional[T]{value: value, present: true}
 }
 
-// Empty создает пустой Optional
+// Empty creates an empty Optional
 func Empty[T any]() Optional[T] {
 	return Optional[T]{present: false}
 }
 
-// Of создает Optional из значения (nil становится Empty)
+// Of creates Optional from a value (nil becomes Empty)
 func Of[T any](value *T) Optional[T] {
 	if value == nil {
 		return Empty[T]()
@@ -26,7 +26,7 @@ func Of[T any](value *T) Optional[T] {
 	return Some(*value)
 }
 
-// OfNillable создает Optional из значения, которое может быть nil
+// OfNillable creates Optional from a value that may be nil
 func OfNillable[T any](value T, isNil bool) Optional[T] {
 	if isNil {
 		return Empty[T]()
@@ -34,17 +34,17 @@ func OfNillable[T any](value T, isNil bool) Optional[T] {
 	return Some(value)
 }
 
-// IsPresent проверяет, есть ли значение
+// IsPresent checks if the Optional has a value
 func (o Optional[T]) IsPresent() bool {
 	return o.present
 }
 
-// IsEmpty проверяет, пустой ли Optional
+// IsEmpty checks if the Optional is empty
 func (o Optional[T]) IsEmpty() bool {
 	return !o.present
 }
 
-// Get возвращает значение или панику, если значения нет
+// Get returns the value or panics if the Optional is empty
 func (o Optional[T]) Get() T {
 	if !o.present {
 		panic("Optional is empty")
@@ -52,7 +52,7 @@ func (o Optional[T]) Get() T {
 	return o.value
 }
 
-// GetOrElse возвращает значение или значение по умолчанию
+// GetOrElse returns the value or a default value
 func (o Optional[T]) GetOrElse(defaultValue T) T {
 	if o.present {
 		return o.value
@@ -60,7 +60,7 @@ func (o Optional[T]) GetOrElse(defaultValue T) T {
 	return defaultValue
 }
 
-// GetOrElseGet возвращает значение или результат функции
+// GetOrElseGet returns the value or the result of a function
 func (o Optional[T]) GetOrElseGet(supplier func() T) T {
 	if o.present {
 		return o.value
@@ -68,7 +68,7 @@ func (o Optional[T]) GetOrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElse возвращает текущий Optional или другой, если текущий пустой
+// OrElse returns the current Optional or another Optional if the current is empty
 func (o Optional[T]) OrElse(other Optional[T]) Optional[T] {
 	if o.present {
 		return o
@@ -76,7 +76,7 @@ func (o Optional[T]) OrElse(other Optional[T]) Optional[T] {
 	return other
 }
 
-// OrElseGet возвращает текущий Optional или результат функции
+// OrElseGet returns the current Optional or the result of a function if the current is empty
 func (o Optional[T]) OrElseGet(supplier func() Optional[T]) Optional[T] {
 	if o.present {
 		return o
@@ -84,7 +84,7 @@ func (o Optional[T]) OrElseGet(supplier func() Optional[T]) Optional[T] {
 	return supplier()
 }
 
-// Map применяет функцию к значению, если оно есть
+// Map applies a function to the value if it is present
 func (o Optional[T]) Map(mapper func(T) T) Optional[T] {
 	if !o.present {
 		return Empty[T]()
@@ -92,7 +92,7 @@ func (o Optional[T]) Map(mapper func(T) T) Optional[T] {
 	return Some(mapper(o.value))
 }
 
-// MapTo применяет функцию и возвращает Optional другого типа
+// MapTo applies a function and returns an Optional of another type
 func MapTo[T, R any](o Optional[T], mapper func(T) R) Optional[R] {
 	if !o.present {
 		return Empty[R]()
@@ -100,7 +100,7 @@ func MapTo[T, R any](o Optional[T], mapper func(T) R) Optional[R] {
 	return Some(mapper(o.value))
 }
 
-// FlatMap применяет функцию, возвращающую Optional
+// FlatMap applies a function that returns an Optional
 func (o Optional[T]) FlatMap(mapper func(T) Optional[T]) Optional[T] {
 	if !o.present {
 		return Empty[T]()
@@ -108,7 +108,7 @@ func (o Optional[T]) FlatMap(mapper func(T) Optional[T]) Optional[T] {
 	return mapper(o.value)
 }
 
-// FlatMapTo применяет функцию, возвращающую Optional другого типа
+// FlatMapTo applies a function that returns an Optional of another type
 func FlatMapTo[T, R any](o Optional[T], mapper func(T) Optional[R]) Optional[R] {
 	if !o.present {
 		return Empty[R]()
@@ -116,7 +116,7 @@ func FlatMapTo[T, R any](o Optional[T], mapper func(T) Optional[R]) Optional[R] 
 	return mapper(o.value)
 }
 
-// Filter фильтрует значение по предикату
+// Filter filters the value by a predicate
 func (o Optional[T]) Filter(predicate Predicate[T]) Optional[T] {
 	if !o.present || !predicate(o.value) {
 		return Empty[T]()
@@ -124,14 +124,14 @@ func (o Optional[T]) Filter(predicate Predicate[T]) Optional[T] {
 	return o
 }
 
-// IfPresent выполняет функцию, если значение есть
+// IfPresent executes a function if the Optional has a value
 func (o Optional[T]) IfPresent(consumer func(T)) {
 	if o.present {
 		consumer(o.value)
 	}
 }
 
-// IfPresentOrElse выполняет одну из функций в зависимости от наличия значения
+// IfPresentOrElse executes one of the functions depending on the presence of a value
 func (o Optional[T]) IfPresentOrElse(consumer func(T), emptyAction func()) {
 	if o.present {
 		consumer(o.value)
@@ -140,7 +140,7 @@ func (o Optional[T]) IfPresentOrElse(consumer func(T), emptyAction func()) {
 	}
 }
 
-// ToPointer возвращает указатель на значение или nil
+// ToPointer returns a pointer to the value or nil
 func (o Optional[T]) ToPointer() *T {
 	if !o.present {
 		return nil
@@ -148,7 +148,7 @@ func (o Optional[T]) ToPointer() *T {
 	return &o.value
 }
 
-// ToSlice возвращает слайс с одним элементом или пустой слайс
+// ToSlice returns a slice with one element or an empty slice
 func (o Optional[T]) ToSlice() []T {
 	if !o.present {
 		return []T{}
@@ -156,7 +156,7 @@ func (o Optional[T]) ToSlice() []T {
 	return []T{o.value}
 }
 
-// String возвращает строковое представление Optional
+// String returns a string representation of the Optional
 func (o Optional[T]) String() string {
 	if !o.present {
 		return "Optional.empty"
@@ -164,35 +164,35 @@ func (o Optional[T]) String() string {
 	return fmt.Sprintf("Optional[%v]", o.value)
 }
 
-// Equals сравнивает два Optional
+// Equals compares two Optional
 func (o Optional[T]) Equals(other Optional[T], equals Equality[T]) bool {
 	if o.present != other.present {
 		return false
 	}
 	if !o.present {
-		return true // оба пустые
+		return true // both are empty
 	}
 	return equals(o.value, other.value)
 }
 
-// Result представляет результат операции, которая может завершиться ошибкой
+// Result represents the result of an operation that may fail
 type Result[T any] struct {
 	value T
 	err   error
 }
 
-// Ok создает успешный Result
+// Ok creates a successful Result
 func Ok[T any](value T) Result[T] {
 	return Result[T]{value: value, err: nil}
 }
 
-// Err создает Result с ошибкой
+// Err creates a Result with an error
 func Err[T any](err error) Result[T] {
 	var zero T
 	return Result[T]{value: zero, err: err}
 }
 
-// TryFrom создает Result из функции, которая может вернуть ошибку
+// TryFrom creates a Result from a function that may return an error
 func TryFrom[T any](fn TryFunc[T]) Result[T] {
 	value, err := fn()
 	if err != nil {
@@ -201,17 +201,17 @@ func TryFrom[T any](fn TryFunc[T]) Result[T] {
 	return Ok(value)
 }
 
-// IsOk проверяет, успешен ли результат
+// IsOk checks if the Result is successful
 func (r Result[T]) IsOk() bool {
 	return r.err == nil
 }
 
-// IsErr проверяет, есть ли ошибка
+// IsErr checks if the Result has an error
 func (r Result[T]) IsErr() bool {
 	return r.err != nil
 }
 
-// Unwrap возвращает значение или панику при ошибке
+// Unwrap returns the value or panics on error
 func (r Result[T]) Unwrap() T {
 	if r.err != nil {
 		panic(fmt.Sprintf("called Unwrap on an Err value: %v", r.err))
@@ -219,7 +219,7 @@ func (r Result[T]) Unwrap() T {
 	return r.value
 }
 
-// UnwrapOr возвращает значение или значение по умолчанию при ошибке
+// UnwrapOr returns the value or a default value on error
 func (r Result[T]) UnwrapOr(defaultValue T) T {
 	if r.err != nil {
 		return defaultValue
@@ -227,7 +227,7 @@ func (r Result[T]) UnwrapOr(defaultValue T) T {
 	return r.value
 }
 
-// UnwrapOrElse возвращает значение или результат функции при ошибке
+// UnwrapOrElse returns the value or the result of a function on error
 func (r Result[T]) UnwrapOrElse(fn func(error) T) T {
 	if r.err != nil {
 		return fn(r.err)
@@ -235,12 +235,12 @@ func (r Result[T]) UnwrapOrElse(fn func(error) T) T {
 	return r.value
 }
 
-// Error возвращает ошибку
+// Error returns the error
 func (r Result[T]) Error() error {
 	return r.err
 }
 
-// Map применяет функцию к значению, если нет ошибки
+// Map applies a function to the value if there is no error
 func (r Result[T]) Map(mapper func(T) T) Result[T] {
 	if r.err != nil {
 		return Err[T](r.err)
@@ -248,7 +248,7 @@ func (r Result[T]) Map(mapper func(T) T) Result[T] {
 	return Ok(mapper(r.value))
 }
 
-// MapTo применяет функцию и возвращает Result другого типа
+// MapTo applies a function and returns a Result of another type
 func MapToResult[T, R any](r Result[T], mapper func(T) R) Result[R] {
 	if r.err != nil {
 		return Err[R](r.err)
@@ -256,7 +256,7 @@ func MapToResult[T, R any](r Result[T], mapper func(T) R) Result[R] {
 	return Ok(mapper(r.value))
 }
 
-// FlatMap применяет функцию, возвращающую Result
+// FlatMap applies a function that returns a Result
 func (r Result[T]) FlatMap(mapper func(T) Result[T]) Result[T] {
 	if r.err != nil {
 		return Err[T](r.err)
@@ -264,7 +264,7 @@ func (r Result[T]) FlatMap(mapper func(T) Result[T]) Result[T] {
 	return mapper(r.value)
 }
 
-// FlatMapTo применяет функцию, возвращающую Result другого типа
+// FlatMapTo applies a function that returns a Result of another type
 func FlatMapToResult[T, R any](r Result[T], mapper func(T) Result[R]) Result[R] {
 	if r.err != nil {
 		return Err[R](r.err)
@@ -272,7 +272,7 @@ func FlatMapToResult[T, R any](r Result[T], mapper func(T) Result[R]) Result[R] 
 	return mapper(r.value)
 }
 
-// MapErr применяет функцию к ошибке
+// MapErr applies a function to the error
 func (r Result[T]) MapErr(mapper func(error) error) Result[T] {
 	if r.err != nil {
 		return Err[T](mapper(r.err))
@@ -280,7 +280,7 @@ func (r Result[T]) MapErr(mapper func(error) error) Result[T] {
 	return r
 }
 
-// ToOptional преобразует Result в Optional (игнорирует ошибку)
+// ToOptional converts Result to Optional (ignores error)
 func (r Result[T]) ToOptional() Optional[T] {
 	if r.err != nil {
 		return Empty[T]()
@@ -288,7 +288,7 @@ func (r Result[T]) ToOptional() Optional[T] {
 	return Some(r.value)
 }
 
-// FromOptional создает Result из Optional
+// FromOptional creates a Result from an Optional
 func FromOptional[T any](opt Optional[T], err error) Result[T] {
 	if opt.IsEmpty() {
 		return Err[T](err)
@@ -298,7 +298,7 @@ func FromOptional[T any](opt Optional[T], err error) Result[T] {
 
 // Utility functions for working with slices of Optional and Result
 
-// FilterSome фильтрует только непустые Optional
+// FilterSome filters only non-empty Optionals
 func FilterSome[T any](optionals []Optional[T]) []T {
 	var result []T
 	for _, opt := range optionals {
@@ -309,7 +309,7 @@ func FilterSome[T any](optionals []Optional[T]) []T {
 	return result
 }
 
-// FilterOk фильтрует только успешные Result
+// FilterOk filters only successful Results
 func FilterOk[T any](results []Result[T]) []T {
 	var result []T
 	for _, res := range results {
@@ -320,7 +320,7 @@ func FilterOk[T any](results []Result[T]) []T {
 	return result
 }
 
-// FilterErr фильтрует только ошибки из Result
+// FilterErr filters only errors from Result
 func FilterErr[T any](results []Result[T]) []error {
 	var errors []error
 	for _, res := range results {
@@ -331,7 +331,7 @@ func FilterErr[T any](results []Result[T]) []error {
 	return errors
 }
 
-// Sequence преобразует слайс Optional в Optional слайса
+// Sequence converts a slice of Optionals to an Optional of a slice
 func Sequence[T any](optionals []Optional[T]) Optional[[]T] {
 	result := make([]T, 0, len(optionals))
 	for _, opt := range optionals {
@@ -343,7 +343,7 @@ func Sequence[T any](optionals []Optional[T]) Optional[[]T] {
 	return Some(result)
 }
 
-// SequenceResults преобразует слайс Result в Result слайса
+// SequenceResults converts a slice of Results to a Result of a slice
 func SequenceResults[T any](results []Result[T]) Result[[]T] {
 	result := make([]T, 0, len(results))
 	for _, res := range results {

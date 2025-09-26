@@ -1,11 +1,11 @@
 package fp
 
-// Filter фильтрует элементы слайса по предикату
+// Filter filters elements of the slice by predicate
 func Filter[T any](slice []T, predicate Predicate[T]) []T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	var result []T
 	for _, item := range slice {
 		if predicate(item) {
@@ -15,12 +15,12 @@ func Filter[T any](slice []T, predicate Predicate[T]) []T {
 	return result
 }
 
-// FilterWithIndex фильтрует элементы слайса по предикату с индексом
+// FilterWithIndex filters elements of the slice by predicate with index
 func FilterWithIndex[T any](slice []T, predicate PredicateWithIndex[T]) []T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	var result []T
 	for i, item := range slice {
 		if predicate(item, i) {
@@ -30,12 +30,12 @@ func FilterWithIndex[T any](slice []T, predicate PredicateWithIndex[T]) []T {
 	return result
 }
 
-// FilterNot фильтрует элементы, НЕ удовлетворяющие предикату
+// FilterNot filters elements that do not satisfy the predicate
 func FilterNot[T any](slice []T, predicate Predicate[T]) []T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	var result []T
 	for _, item := range slice {
 		if !predicate(item) {
@@ -45,12 +45,12 @@ func FilterNot[T any](slice []T, predicate Predicate[T]) []T {
 	return result
 }
 
-// FilterNotNil фильтрует nil элементы
+// FilterNotNil filters nil elements
 func FilterNotNil[T any](slice []*T) []*T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	var result []*T
 	for _, item := range slice {
 		if item != nil {
@@ -60,12 +60,12 @@ func FilterNotNil[T any](slice []*T) []*T {
 	return result
 }
 
-// FilterNotZero фильтрует нулевые значения
+// FilterNotZero filters zero values
 func FilterNotZero[T comparable](slice []T) []T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	var zero T
 	var result []T
 	for _, item := range slice {
@@ -76,12 +76,12 @@ func FilterNotZero[T comparable](slice []T) []T {
 	return result
 }
 
-// Partition разделяет слайс на два по предикату
+// Partition partitions the slice into two based on the predicate
 func Partition[T any](slice []T, predicate Predicate[T]) ([]T, []T) {
 	if slice == nil {
 		return nil, nil
 	}
-	
+
 	var truthy, falsy []T
 	for _, item := range slice {
 		if predicate(item) {
@@ -93,12 +93,12 @@ func Partition[T any](slice []T, predicate Predicate[T]) ([]T, []T) {
 	return truthy, falsy
 }
 
-// Find находит первый элемент, удовлетворяющий предикату
+// Find finds the first element that satisfies the predicate
 func Find[T any](slice []T, predicate Predicate[T]) (*T, bool) {
 	if slice == nil {
 		return nil, false
 	}
-	
+
 	for _, item := range slice {
 		if predicate(item) {
 			return &item, true
@@ -107,12 +107,12 @@ func Find[T any](slice []T, predicate Predicate[T]) (*T, bool) {
 	return nil, false
 }
 
-// FindIndex находит индекс первого элемента, удовлетворяющего предикату
+// FindIndex finds the index of the first element that satisfies the predicate
 func FindIndex[T any](slice []T, predicate Predicate[T]) int {
 	if slice == nil {
 		return -1
 	}
-	
+
 	for i, item := range slice {
 		if predicate(item) {
 			return i
@@ -121,12 +121,12 @@ func FindIndex[T any](slice []T, predicate Predicate[T]) int {
 	return -1
 }
 
-// FindLast находит последний элемент, удовлетворяющий предикату
+// FindLast finds the last element that satisfies the predicate
 func FindLast[T any](slice []T, predicate Predicate[T]) (*T, bool) {
 	if slice == nil {
 		return nil, false
 	}
-	
+
 	for i := len(slice) - 1; i >= 0; i-- {
 		if predicate(slice[i]) {
 			return &slice[i], true
@@ -135,12 +135,12 @@ func FindLast[T any](slice []T, predicate Predicate[T]) (*T, bool) {
 	return nil, false
 }
 
-// All проверяет, что все элементы удовлетворяют предикату
+// All checks if all elements satisfy the predicate
 func All[T any](slice []T, predicate Predicate[T]) bool {
 	if slice == nil {
 		return true
 	}
-	
+
 	for _, item := range slice {
 		if !predicate(item) {
 			return false
@@ -149,12 +149,12 @@ func All[T any](slice []T, predicate Predicate[T]) bool {
 	return true
 }
 
-// Any проверяет, что хотя бы один элемент удовлетворяет предикату
+// Any checks if any element satisfies the predicate
 func Any[T any](slice []T, predicate Predicate[T]) bool {
 	if slice == nil {
 		return false
 	}
-	
+
 	for _, item := range slice {
 		if predicate(item) {
 			return true
@@ -163,17 +163,17 @@ func Any[T any](slice []T, predicate Predicate[T]) bool {
 	return false
 }
 
-// None проверяет, что ни один элемент не удовлетворяет предикату
+// None checks if no element satisfies the predicate
 func None[T any](slice []T, predicate Predicate[T]) bool {
 	return !Any(slice, predicate)
 }
 
-// Count подсчитывает количество элементов, удовлетворяющих предикату
+// Count counts the number of elements that satisfy the predicate
 func Count[T any](slice []T, predicate Predicate[T]) int {
 	if slice == nil {
 		return 0
 	}
-	
+
 	count := 0
 	for _, item := range slice {
 		if predicate(item) {
@@ -183,15 +183,15 @@ func Count[T any](slice []T, predicate Predicate[T]) int {
 	return count
 }
 
-// Unique возвращает уникальные элементы слайса
+// Unique returns unique elements of the slice
 func Unique[T comparable](slice []T) []T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	seen := make(map[T]bool)
 	var result []T
-	
+
 	for _, item := range slice {
 		if !seen[item] {
 			seen[item] = true
@@ -201,15 +201,15 @@ func Unique[T comparable](slice []T) []T {
 	return result
 }
 
-// UniqueBy возвращает уникальные элементы по ключу
+// UniqueBy returns unique elements of the slice by key
 func UniqueBy[T any, K comparable](slice []T, keyExtractor KeyExtractor[T, K]) []T {
 	if slice == nil {
 		return nil
 	}
-	
+
 	seen := make(map[K]bool)
 	var result []T
-	
+
 	for _, item := range slice {
 		key := keyExtractor(item)
 		if !seen[key] {

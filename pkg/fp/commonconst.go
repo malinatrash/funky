@@ -1,36 +1,36 @@
 package fp
 
-// Предикатные функции
+// Predicate functions
 type Predicate[T any] func(T) bool
 type PredicateWithIndex[T any] func(T, int) bool
 
-// Трансформирующие функции
+// Mapper functions
 type Mapper[T, R any] func(T) R
 type MapperWithIndex[T, R any] func(T, int) R
 
-// Редуцирующие функции
+// Reducer functions
 type Reducer[T, R any] func(R, T) R
 type ReducerWithIndex[T, R any] func(R, T, int) R
 
-// Функции сравнения
+// Comparator functions
 type Comparator[T any] func(T, T) int
 type Equality[T any] func(T, T) bool
 
-// Функции группировки
+// Key extractor function
 type KeyExtractor[T any, K comparable] func(T) K
 
-// Функции для работы с ошибками
+// Error handler function
 type ErrorHandler func(error)
 type TryFunc[T any] func() (T, error)
 
-// Константы для сравнения
+// Comparison constants
 const (
 	Less    = -1
 	Equal   = 0
 	Greater = 1
 )
 
-// Общие предикаты
+// Common predicates
 func IsNil[T any](item *T) bool {
 	return item == nil
 }
@@ -48,12 +48,12 @@ func IsNotZero[T comparable](item T) bool {
 	return !IsZero(item)
 }
 
-// Identity функция
+// Identity function
 func Identity[T any](item T) T {
 	return item
 }
 
-// Константная функция
+// Constant function
 func Const[T, R any](value R) func(T) R {
 	return func(T) R {
 		return value
