@@ -526,6 +526,7 @@ func Chars(s string) []string {
 // Runes splits a string into runes
 func Runes(s string) []rune {
 	return []rune(s)
+	// TODO: implement Runes
 }
 
 // StringJoin joins a slice of strings with a separator
