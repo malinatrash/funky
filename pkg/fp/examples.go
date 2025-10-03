@@ -43,11 +43,10 @@ func DemoBasicOperations() {
 	sum := Reduce(numbers, func(acc, x int) int { return acc + x }, 0)
 	fmt.Printf("Sum: %d\n", sum)
 
-	// Combined operation
-	result := Pipe3(numbers,
-		func(nums []int) []int { return Filter(nums, func(x int) bool { return x > 5 }) },
-		func(nums []int) []int { return Map(nums, func(x int) int { return x * x }) },
-		func(nums []int) int { return Reduce(nums, func(acc, x int) int { return acc + x }, 0) })
+	// Combined operation using chained approach
+	filtered := Filter(numbers, func(x int) bool { return x > 5 })
+	squared := Map(filtered, func(x int) int { return x * x })
+	result := Reduce(squared, func(acc, x int) int { return acc + x }, 0)
 
 	fmt.Printf("Filtered > 5, squared and summed: %d\n", result)
 }
@@ -188,8 +187,7 @@ func DemoAdvancedFeatures() {
 	// Function composition
 	processString := Compose3(
 		func(s string) string { return "Result: " + s },
-		func(s string) string { return strings.ToUpper(s) },
-		strings.TrimSpace,
+		func(s string) string { return strings.ToUpper(strings.TrimSpace(s)) },
 	)
 
 	result := processString("  hello world  ")
@@ -322,7 +320,7 @@ func DemoRealWorldExample() {
 // RunAllExamples runs all examples
 func RunAllExamples() {
 	fmt.Println("🚀 Demonstration of Functional Programming Library")
-	fmt.Println("=" * 50)
+	fmt.Println(strings.Repeat("=", 50))
 
 	DemoBasicOperations()
 	DemoCollections()
